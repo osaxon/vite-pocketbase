@@ -1,9 +1,20 @@
+import { Button } from "@/components/ui/button";
+import { Form, FormField, FormItem } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { postQueryOpptions } from "@/postQueryOptions";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
+export const validSearchParms = z.object({
+    title: z.string().optional(),
+});
 
 export const Route = createFileRoute("/posts")({
+    validateSearch: (search) => validSearchParms.parse(search),
+    loaderDeps: ({ search: { title } }) => ({ title }),
     beforeLoad: ({ location, context }) => {
         console.log("[context auth store]", context.auth.isValid);
         if (!context.auth.isValid) {
@@ -15,18 +26,57 @@ export const Route = createFileRoute("/posts")({
             });
         }
     },
-    loader: ({ context: { queryClient } }) =>
-        queryClient.ensureQueryData(postQueryOpptions),
+    loader: ({ context: { queryClient }, deps: { title } }) =>
+        queryClient.ensureQueryData(postQueryOpptions(title)),
     component: PostsComponent,
 });
 
 function PostsComponent() {
-    const postsQuery = useSuspenseQuery(postQueryOpptions);
+    const { title } = Route.useSearch();
+    const postsQuery = useSuspenseQuery(postQueryOpptions(title));
     const posts = postsQuery.data;
 
     return (
         <div>
+            <p>search: {title}</p>
+            <SearchForm />
             <pre>{JSON.stringify(posts, null, 2)}</pre>
         </div>
     );
 }
+
+const SearchForm = () => {
+    const form = useForm<z.infer<typeof validSearchParms>>({
+        resolver: zodResolver(validSearchParms),
+        defaultValues: {
+            title: "",
+        },
+    });
+    const navigate = useNavigate();
+
+    const onSubmit = (data: z.infer<typeof validSearchParms>) => {
+        console.log(data);
+        navigate({
+            search: {
+                title: data.title,
+            },
+        });
+    };
+
+    return (
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                        <FormItem>
+                            <Input placeholder="title..." {...field} />
+                        </FormItem>
+                    )}
+                />
+                <Button type="submit">Submit</Button>
+            </form>
+        </Form>
+    );
+};
