@@ -5,16 +5,15 @@ import {
     FormField,
     FormItem,
     FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { pb } from "@/lib/pocketbase";
-import { UsersRecord } from "@/types/pocketbase-types";
+import { loginError, useLogin } from "@/utils/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { RecordAuthResponse } from "pocketbase";
 import { useLayoutEffect } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
 const validSearchParms = z.object({
@@ -47,22 +46,20 @@ function SignInComponent() {
         },
     });
 
+    const { mutate: login, isError } = useLogin(router);
+
     const onSubmit = async (formData: z.infer<typeof loginSchema>) => {
-        // TODO add client side validation and submission
         console.log(formData);
-        const res = await pb
-            .collection("users")
-            .authWithPassword<
-                RecordAuthResponse<UsersRecord>
-            >(formData.email, formData.password);
-        if (res.token) {
-            toast.success("Logged in successfully");
-            router.invalidate();
+        login(formData);
+        if (isError) {
+            form.setError("password", loginError);
+            form.setError("email", loginError);
         }
     };
 
     useLayoutEffect(() => {
         if (isValid && search.redirect) {
+            console.log(isValid);
             router.history.push(search.redirect);
         }
     }, [isValid, search.redirect]);
@@ -95,6 +92,7 @@ function SignInComponent() {
                                 <FormControl>
                                     <Input placeholder="" {...field} />
                                 </FormControl>
+                                <FormMessage />
                             </FormItem>
                         )}
                     />
