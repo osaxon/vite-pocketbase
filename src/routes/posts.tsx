@@ -1,14 +1,20 @@
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { postQueryOpptions } from "@/postQueryOptions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import {
+    createFileRoute,
+    notFound,
+    redirect,
+    useNavigate,
+} from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-export const validSearchParms = z.object({
+const validSearchParms = z.object({
     title: z.string().optional(),
 });
 
@@ -16,7 +22,7 @@ export const Route = createFileRoute("/posts")({
     validateSearch: (search) => validSearchParms.parse(search),
     loaderDeps: ({ search: { title } }) => ({ title }),
     beforeLoad: ({ location, context }) => {
-        console.log("[context auth store]", context.auth.isValid);
+        console.log("[context auth store]", context.auth);
         if (!context.auth.isValid) {
             throw redirect({
                 to: "/sign-in",
@@ -26,21 +32,29 @@ export const Route = createFileRoute("/posts")({
             });
         }
     },
-    loader: ({ context: { queryClient }, deps: { title } }) =>
-        queryClient.ensureQueryData(postQueryOpptions(title)),
+    pendingComponent: () => <Spinner size="lg" />,
+    loader: async ({ context: { queryClient }, deps: { title } }) => {
+        const posts = await queryClient.ensureQueryData(
+            postQueryOpptions(title)
+        );
+        if (!posts) {
+            throw notFound({ throw: true });
+        }
+        return { posts };
+    },
     component: PostsComponent,
 });
 
 function PostsComponent() {
     const { title } = Route.useSearch();
     const postsQuery = useSuspenseQuery(postQueryOpptions(title));
-    const posts = postsQuery.data;
+    const { data } = postsQuery;
 
     return (
         <div>
             <p>search: {title}</p>
             <SearchForm />
-            <pre>{JSON.stringify(posts, null, 2)}</pre>
+            <pre>{JSON.stringify(data, null, 2)}</pre>
         </div>
     );
 }

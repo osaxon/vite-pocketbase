@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { Link, RouterProvider, createRouter } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { pb } from "./lib/pocketbase";
@@ -14,12 +14,24 @@ const router = createRouter({
         queryClient,
         auth: pb.authStore,
     },
-    defaultPreloadStaleTime: 0,
+    // defaultPreloadStaleTime: 0,
+    // defaultPendingMs: 2000,
+    // defaultPendingComponent: () => <Spinner size="lg" />,
+    defaultNotFoundComponent: () => {
+        return (
+            <div>
+                Not found
+                <Link to="/">Home</Link>
+            </div>
+        );
+    },
 });
+
+export type MyRouter = typeof router;
 
 declare module "@tanstack/react-router" {
     interface Register {
-        router: typeof router;
+        router: MyRouter;
     }
 }
 
