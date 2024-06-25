@@ -1,7 +1,6 @@
 import {
     RouteParams,
     RouteStrings,
-    Routes,
     RoutesWithParams,
     RoutesWithoutParams,
 } from "@/types/types";
