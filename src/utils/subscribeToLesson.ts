@@ -32,7 +32,7 @@ export const useSubscribeToLesson = (queryClient: QueryClient) =>
         mutationKey: ["subscribeToLesson"],
         onSettled: async (_data, _error, variables) => {
             return await queryClient.invalidateQueries({
-                queryKey: ["lessons", variables.userId],
+                queryKey: ["user_lessons", variables.userId],
             });
         },
         onError: (err) => {
