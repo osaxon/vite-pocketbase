@@ -179,8 +179,8 @@
         "indexes": [],
         "listRule": "",
         "viewRule": "",
-        "createRule": null,
-        "updateRule": null,
+        "createRule": "",
+        "updateRule": "",
         "deleteRule": null,
         "options": {}
     },
@@ -265,8 +265,8 @@
         "indexes": [],
         "listRule": "",
         "viewRule": "",
-        "createRule": null,
-        "updateRule": null,
+        "createRule": "",
+        "updateRule": "",
         "deleteRule": null,
         "options": {}
     },
@@ -368,12 +368,32 @@
                     "maxSelect": 1,
                     "displayFields": null
                 }
+            },
+            {
+                "system": false,
+                "id": "zp2zmp75",
+                "name": "status",
+                "type": "select",
+                "required": false,
+                "presentable": false,
+                "unique": false,
+                "options": {
+                    "maxSelect": 1,
+                    "values": [
+                        "Not Started",
+                        "In Progress",
+                        "Complete",
+                        "Cancelled"
+                    ]
+                }
             }
         ],
-        "indexes": [],
-        "listRule": null,
-        "viewRule": null,
-        "createRule": null,
+        "indexes": [
+            "CREATE UNIQUE INDEX `idx_jOQ4lj8` ON `user_lessons` (\n  `user`,\n  `lesson`\n)"
+        ],
+        "listRule": "",
+        "viewRule": "",
+        "createRule": "",
         "updateRule": null,
         "deleteRule": null,
         "options": {}
@@ -443,8 +463,8 @@
         "indexes": [
             "CREATE UNIQUE INDEX `idx_tnuefJ8` ON `user_modules` (\n  `user`,\n  `module`\n)"
         ],
-        "listRule": null,
-        "viewRule": null,
+        "listRule": "",
+        "viewRule": "",
         "createRule": null,
         "updateRule": null,
         "deleteRule": null,

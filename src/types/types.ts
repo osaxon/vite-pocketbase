@@ -1,9 +1,11 @@
+import { LessonsGradeOptions } from "./pocketbase-types";
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export const Routes = {
     CreateModuleWithLessonId: "/api/ext/collections/modules/records",
     SubscribeToLesson: "/api/ext/lessons/:lesson/subscribe",
+    GetUserDashboard: "/api/ext/users/:user/dashboard",
 } as const;
-
 
 export type RouteStrings = (typeof Routes)[keyof typeof Routes];
 // Utility type to extract keys from the route string
@@ -42,3 +44,32 @@ export type RoutesWithoutParams = {
         ? (typeof Routes)[K]
         : never;
 }[keyof typeof Routes];
+
+export type UserLessonForDashboard = {
+    grade: LessonsGradeOptions;
+    id: string; //
+    lessonId: string; //
+    name: string; //
+    percentComplete: number;
+    status: string;
+    userId: string; //
+};
+
+export type UserModuleForDashboard = {
+    id: string;
+    lessonId: string;
+    moduleId: string;
+    name: string;
+    userId: string;
+    isComplete: boolean;
+};
+
+export type DashboardData = {
+    avatar: string;
+    email: string;
+    id: string;
+    lessons: UserLessonForDashboard[];
+    modules: UserModuleForDashboard[];
+    name: string;
+    username: string;
+};

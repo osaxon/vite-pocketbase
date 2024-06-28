@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { pb } from "@/lib/pocketbase";
 import { loginError, useLogin } from "@/utils/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { useLayoutEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -27,6 +27,16 @@ const loginSchema = z.object({
 
 export const Route = createFileRoute("/sign-in")({
     validateSearch: (search) => validSearchParms.parse(search),
+    beforeLoad: ({ context }) => {
+        if (context.auth.isValid) {
+            throw redirect({
+                to: `/dashboard/$userId`,
+                params: {
+                    userId: context.auth.model?.id,
+                },
+            });
+        }
+    },
 }).update({
     component: SignInComponent,
 });
