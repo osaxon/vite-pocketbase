@@ -10,9 +10,11 @@ export const dashboardQueryOptions = (userId: string) => {
             const url = createExtendedRoute("/api/ext/users/:user/dashboard", {
                 user: userId,
             });
-            return await pb.send<DashboardData>(url, {
+
+            const res = await pb.send<DashboardData>(url, {
                 method: "GET",
             });
+            return res;
         },
     });
 };

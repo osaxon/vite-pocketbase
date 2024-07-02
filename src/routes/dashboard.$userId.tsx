@@ -10,23 +10,34 @@ import { Progress } from "@/components/ui/progress";
 import type { UserLessonForDashboard } from "@/types/types";
 import { dashboardQueryOptions } from "@/utils/useDashboardQuery";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { Link, createFileRoute, redirect } from "@tanstack/react-router";
+import {
+    Link,
+    createFileRoute,
+    notFound,
+    redirect,
+} from "@tanstack/react-router";
 
 export const Route = createFileRoute("/dashboard/$userId")({
-    beforeLoad: ({ location, context }) => {
-        if (!context.auth.isValid) {
+    beforeLoad: async ({ context }) => {
+        const user = await context.authRefresh();
+        if (!user) {
             throw redirect({
                 to: "/sign-in",
                 search: {
-                    redirect: location.href,
+                    redirect: "/lessons",
                 },
             });
         }
     },
-    loader: async ({ context: { queryClient, auth } }) => {
+    loader: async ({ context: { queryClient, user } }) => {
         const dashboardData = await queryClient.ensureQueryData(
-            dashboardQueryOptions(auth.model?.id)
+            dashboardQueryOptions(user?.id)
         );
+        if (!dashboardData) {
+            console.log("not found");
+            throw notFound();
+        }
+        console.log(dashboardData);
 
         return { dashboardData };
     },
@@ -35,10 +46,11 @@ export const Route = createFileRoute("/dashboard/$userId")({
 
 function DashboardComponent() {
     const context = Route.useRouteContext();
-    const userId = context.auth.model?.id;
+    const userId = context.user?.id;
     const { data: dashboardData } = useSuspenseQuery(
         dashboardQueryOptions(userId)
     );
+
     const { lessons } = dashboardData;
 
     return (
