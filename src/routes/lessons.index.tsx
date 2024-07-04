@@ -8,7 +8,7 @@ import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/lessons/")({
     beforeLoad: ({ location, context }) => {
-        if (!context.auth.isValid) {
+        if (!context.pb.authStore.isValid) {
             throw redirect({
                 to: "/sign-in",
                 search: {
@@ -18,10 +18,10 @@ export const Route = createFileRoute("/lessons/")({
         }
     },
     pendingComponent: () => <Spinner size="lg" />,
-    loader: async ({ context: { queryClient, auth } }) => {
+    loader: async ({ context: { queryClient, user } }) => {
         const lessons = await queryClient.ensureQueryData(lessonQueryOptions());
         const userLessons = await queryClient.ensureQueryData(
-            userLessonsQueryOptions(auth.model?.id)
+            userLessonsQueryOptions(user?.id)
         );
 
         if (!lessons) {
@@ -35,14 +35,11 @@ export const Route = createFileRoute("/lessons/")({
 
 function LessonsComponent() {
     const context = Route.useRouteContext();
-    const lessonsQuery = useSuspenseQuery(lessonQueryOptions());
-    const userLessonsQuery = useSuspenseQuery(
-        userLessonsQueryOptions(context.auth.model?.id)
+    const { data: lessons } = useSuspenseQuery(lessonQueryOptions());
+    const { data: userLessons } = useSuspenseQuery(
+        userLessonsQueryOptions(context.user?.id)
     );
     const { mutate: subscribe } = useSubscribeToLesson(context.queryClient);
-
-    const { data: lessons } = lessonsQuery;
-    const { data: userLessons } = userLessonsQuery;
 
     const isSubscribed = (lessonId: string) =>
         userLessons.items.map(({ lesson }) => lesson).includes(lessonId);
@@ -58,7 +55,7 @@ function LessonsComponent() {
                         <Button
                             onClick={() =>
                                 subscribe({
-                                    userId: context.auth.model?.id,
+                                    userId: context.user?.id,
                                     lessonId: lesson.id,
                                 })
                             }

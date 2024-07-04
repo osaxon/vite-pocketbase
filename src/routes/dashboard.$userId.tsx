@@ -19,8 +19,7 @@ import {
 
 export const Route = createFileRoute("/dashboard/$userId")({
     beforeLoad: async ({ context }) => {
-        const user = await context.authRefresh();
-        if (!user) {
+        if (!context.token) {
             throw redirect({
                 to: "/sign-in",
                 search: {
@@ -37,7 +36,6 @@ export const Route = createFileRoute("/dashboard/$userId")({
             console.log("not found");
             throw notFound();
         }
-        console.log(dashboardData);
 
         return { dashboardData };
     },

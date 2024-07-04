@@ -40,6 +40,9 @@
         "zod": "^3.23.8"
     },
     "devDependencies": {
+        "@testing-library/jest-dom": "^6.4.6",
+        "@testing-library/react": "^16.0.0",
+        "@types/jest": "^29.5.12",
         "@types/node": "^20.14.2",
         "@types/react": "^18.2.66",
         "@types/react-dom": "^18.2.22",
@@ -50,6 +53,8 @@
         "eslint": "^8.57.0",
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-react-refresh": "^0.4.6",
+        "i": "^0.3.7",
+        "jsdom": "^24.1.0",
         "postcss": "^8.4.38",
         "tailwindcss": "^3.4.4",
         "typescript": "^5.5.2",

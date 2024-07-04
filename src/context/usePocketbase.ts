@@ -25,14 +25,20 @@ export const usePocketbase = () => {
     const [user, setUser] = useState<AuthModel | undefined>(pb.authStore.model);
 
     useEffect(() => {
+        console.log("use pocketbase use effect");
         const unsub = pb.authStore.onChange((token, model) => {
+            console.log("onChange cb");
             setToken(token);
             setUser(model);
         }, true);
-        return unsub();
+        return () => {
+            console.log("use effect cleanup fn");
+            unsub();
+        };
     }, []);
 
     async function authRefresh() {
+        console.log("auth refresh");
         try {
             const response = await pb
                 .collection("users")
@@ -47,10 +53,12 @@ export const usePocketbase = () => {
     }
 
     const refreshSession = useCallback(async () => {
+        console.log("refreshing session...");
         if (!pb.authStore.isValid) return;
         const decoded = jwtDecode(token);
         const tokenExpiration = decoded.exp;
         const expirationWithBuffer = (decoded.exp! + fiveMinutesInMs) / 1000;
+        console.log(token);
         if (tokenExpiration! < expirationWithBuffer) {
             console.log("refreshing token....");
             await authRefresh();
@@ -58,11 +66,10 @@ export const usePocketbase = () => {
     }, [pb, token]);
 
     useInterval(refreshSession, token ? twoMinutesInMs : null);
-
+    
     return {
         user,
         token,
-        authRefresh,
-        client: pb,
+        pb,
     };
 };

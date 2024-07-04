@@ -12,11 +12,9 @@ const router = createRouter({
     defaultPreload: "intent",
     context: {
         queryClient,
-        auth: pb.authStore,
         token: "",
         user: undefined,
-        authRefresh: () => undefined,
-        client: pb,
+        pb: pb,
     },
     defaultNotFoundComponent: () => {
         return (
@@ -37,7 +35,7 @@ declare module "@tanstack/react-router" {
 }
 
 export default function App() {
-    const { user, token, authRefresh, client } = usePocketbase();
+    const { user, token, pb } = usePocketbase();
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -47,8 +45,7 @@ export default function App() {
                     user,
                     token,
                     queryClient,
-                    authRefresh,
-                    client,
+                    pb,
                 }}
             />
         </QueryClientProvider>

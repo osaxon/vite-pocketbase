@@ -2,6 +2,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { pb } from "./lib/pocketbase";
 import {
+    TypedPocketBase,
     UserLessonsRecord,
     UserModulesRecord,
     UsersResponse,
@@ -34,4 +35,20 @@ export const userQueryOptions = (userId: string) =>
     queryOptions({
         queryKey: ["user", userId],
         queryFn: () => getUserDashboardData(userId),
+    });
+
+export const userRecordQueryOptions = (userId: string, pb: TypedPocketBase) =>
+    queryOptions({
+        queryKey: ["user", "record", userId],
+        queryFn: async () => {
+            const user = await pb.collection("users").getOne(userId);
+            console.log(user);
+            const avatar = await pb.files.getUrl(user, user.avatar);
+            console.log(avatar, "full url");
+
+            return {
+                ...user,
+                avatar,
+            };
+        },
     });
