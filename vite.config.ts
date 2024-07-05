@@ -4,7 +4,6 @@ import path from "path";
 import { defineConfig } from "vite";
 import viteReact from "@vitejs/plugin-react";
 import { TanStackRouterVite } from "@tanstack/router-vite-plugin";
-import "@testing-library/jest-dom/vitest";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,7 +11,7 @@ export default defineConfig({
     test: {
         globals: true,
         environment: "jsdom",
-        setupFiles: ["./src/setupTests.ts"],
+        setupFiles: ["./src/tests/setup.ts"],
     },
     resolve: {
         alias: {

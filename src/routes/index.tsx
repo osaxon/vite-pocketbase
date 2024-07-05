@@ -4,11 +4,12 @@ export const Route = createFileRoute("/")({
     component: Home,
 });
 
-function Home() {
+export function Home() {
     return (
         <div>
             <h1>Home</h1>
             <p>Welcome to your new app!</p>
+            <button>Button</button>
         </div>
     );
 }

@@ -3,9 +3,8 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/sonner";
 import type { TypedPocketBase } from "@/types/pocketbase-types";
-import { userRecordQueryOptions } from "@/userQueryOptions";
-import { AvatarImage } from "@radix-ui/react-avatar";
-import { QueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { AvatarFallback } from "@radix-ui/react-avatar";
+import { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import {
     Link,
@@ -28,12 +27,6 @@ export const Route = createRootRouteWithContext<{
 
 function RootComponent() {
     const context = Route.useRouteContext();
-
-    const { data: user } = useSuspenseQuery(
-        userRecordQueryOptions(context.user?.id, context.pb)
-    );
-
-    console.log(user, "root component user");
 
     return (
         <>
@@ -62,7 +55,7 @@ function RootComponent() {
                         {context.token ? (
                             <div className="flex items-center gap-8">
                                 <Avatar>
-                                    <AvatarImage src={user.avatar} />
+                                    <AvatarFallback>OS</AvatarFallback>
                                 </Avatar>
                                 <Button asChild>
                                     <Link
@@ -92,7 +85,9 @@ function RootComponent() {
                 </div>
             </div>
             <hr />
-            <Outlet />
+            <div className="min-h-screen max-w-5xl mx-auto p-4">
+                <Outlet />
+            </div>
             <Toaster />
             <ReactQueryDevtools position="right" />
             <TanStackRouterDevtools position="bottom-left" />

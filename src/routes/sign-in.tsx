@@ -55,7 +55,7 @@ function SignInComponent() {
         },
     });
 
-    const pb = Route.useRouteContext({ select: ({ client }) => client });
+    const pb = Route.useRouteContext({ select: ({ pb }) => pb });
 
     const { mutate: login, isError } = useLogin(router, pb);
 
